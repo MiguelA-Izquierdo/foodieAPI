@@ -2,126 +2,114 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use App\Repositories\RestaurantRepository;
+use App\Models\Restaurant;
 
 class RestaurantController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $restaurantRepository;
+
+    public function __construct(RestaurantRepository $restaurantRepository)
+    {
+        $this->restaurantRepository = $restaurantRepository;
+    }
+
     public function index()
     {
-        //
-        $restaurants= Restaurant::all();
-        return response()->json($restaurants);
-
+        try {
+            $restaurants = $this->restaurantRepository->getAll();
+            return response()->json($restaurants, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los restaurantes'], 500);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
             // Valida los datos enviados en la solicitud
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'address' => 'required|string|max:255',
                 'phone' => 'required|string|max:20',
             ]);
 
-            // Crea un nuevo restaurante en la base de datos
-            $restaurant = Restaurant::create([
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $newRestaurant = [
                 'name' => $request->input('name'),
                 'address' => $request->input('address'),
                 'phone' => $request->input('phone'),
-            ]);
+            ];
 
-            return response()->json(['message' => 'Restaurante creado con éxito', 'Restaurant' => $restaurant], 201);
+            $restaurant = $this->restaurantRepository->create($newRestaurant);
+
+            return response()->json(['message' => 'Restaurante creado con éxito', 'restaurant' => $restaurant], 201);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->errors()], 400);
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo crear el restaurante'], 500);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         try {
-            $restaurant = Restaurant::findOrFail($id); // Encuentra el restaurante por su ID
-
+            $restaurant = $this->restaurantRepository->getById($id);
             return response()->json(['data' => $restaurant], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Restaurante no encontrado'], 404);
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Restaurant $restaurant)
-    {
-        //
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         try {
-            $restaurant = Restaurant::findOrFail($id); // Encuentra el restaurante por su ID
+            $restaurant = $this->restaurantRepository->getById($id);
 
-            // Valida los datos enviados en la solicitud
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'name' => 'string|max:255',
                 'address' => 'string|max:255',
                 'phone' => 'string|max:20',
             ]);
 
-            // Actualiza los campos del restaurante si se proporcionan en la solicitud
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $newData = [];
+
             if ($request->has('name')) {
-                $restaurant->name = $request->input('name');
+                $newData['name'] = $request->input('name');
             }
 
             if ($request->has('address')) {
-                $restaurant->address = $request->input('address');
+                $newData['address'] = $request->input('address');
             }
 
             if ($request->has('phone')) {
-                $restaurant->phone = $request->input('phone');
+                $newData['phone'] = $request->input('phone');
             }
 
-            // Guarda los cambios
-            $restaurant->save();
+            $this->restaurantRepository->update($id, $newData);
 
             return response()->json(['message' => 'Restaurante actualizado con éxito'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->errors()], 400);
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo actualizar el restaurante'], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-   public function destroy($id)
+    public function destroy($id)
     {
         try {
-            $restaurant = Restaurant::findOrFail($id); // Encuentra el restaurante por su ID
-
-            $restaurant->delete(); // Elimina el restaurante
-
+            $this->restaurantRepository->delete($id);
             return response()->json(['message' => 'Restaurante eliminado con éxito'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'No se pudo eliminar el restaurante'], 500);

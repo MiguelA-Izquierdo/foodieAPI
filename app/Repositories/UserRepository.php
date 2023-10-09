@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use Illuminate\Support\Facades\Log;
@@ -11,8 +12,7 @@ class UserRepository
         try {
             return User::all();
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al obtener todos los usuarios');
+            $this->logAndThrowException('Error al obtener todos los usuarios', $error);
         }
     }
 
@@ -21,12 +21,11 @@ class UserRepository
         try {
             $user = User::find($id);
             if (!$user) {
-                throw new \Exception('Usuario no encontrado');
+                $this->logAndThrowException('Usuario no encontrado');
             }
             return $user;
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al obtener el usuario por ID');
+            $this->logAndThrowException('Error al obtener el usuario por ID', $error);
         }
     }
 
@@ -35,24 +34,22 @@ class UserRepository
         try {
             return User::create($newData);
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al crear el usuario');
+            $this->logAndThrowException('Error al crear el usuario', $error);
         }
     }
 
-    public function update($id, array $newData)
+    public function update($id, $newData)
     {
         try {
             $user = User::find($id);
             if (!$user) {
-                throw new \Exception('Usuario no encontrado');
+                $this->logAndThrowException('Usuario no encontrado');
             }
 
             $user->update($newData);
             return $user;
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al actualizar el usuario');
+            $this->logAndThrowException('Error al actualizar el usuario', $error);
         }
     }
 
@@ -61,13 +58,12 @@ class UserRepository
         try {
             $user = User::find($id);
             if (!$user) {
-                throw new \Exception('Usuario no encontrado');
+                $this->logAndThrowException('Usuario no encontrado');
             }
 
             $user->delete();
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al eliminar el usuario');
+            $this->logAndThrowException('Error al eliminar el usuario', $error);
         }
     }
 
@@ -76,8 +72,15 @@ class UserRepository
         try {
             return User::where($criteria)->get();
         } catch (\Exception $error) {
-            Log::error($error);
-            throw new \Exception('Error al buscar usuarios por criterios');
+            $this->logAndThrowException('Error al buscar usuarios por criterios', $error);
         }
+    }
+
+    private function logAndThrowException($message, \Exception $error = null)
+    {
+        if ($error) {
+            Log::error($error);
+        }
+        throw new \Exception($message);
     }
 }
