@@ -5,6 +5,7 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
+    'token_secret' => env('TOKEN_SECRET'),
     /*
     |--------------------------------------------------------------------------
     | Application Name
