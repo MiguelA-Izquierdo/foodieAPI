@@ -30,7 +30,6 @@ class RestaurantController extends Controller
     public function store(Request $request)
     {
         try {
-            // Valida los datos enviados en la solicitud
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'address' => 'required|string|max:255',
@@ -41,11 +40,7 @@ class RestaurantController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $newRestaurant = [
-                'name' => $request->input('name'),
-                'address' => $request->input('address'),
-                'phone' => $request->input('phone'),
-            ];
+            $newRestaurant = $request->only(['name', 'address', 'phone']);
 
             $restaurant = $this->restaurantRepository->create($newRestaurant);
 
@@ -82,19 +77,7 @@ class RestaurantController extends Controller
                 throw new ValidationException($validator);
             }
 
-            $newData = [];
-
-            if ($request->has('name')) {
-                $newData['name'] = $request->input('name');
-            }
-
-            if ($request->has('address')) {
-                $newData['address'] = $request->input('address');
-            }
-
-            if ($request->has('phone')) {
-                $newData['phone'] = $request->input('phone');
-            }
+            $newData = $request->only(['name', 'address', 'phone']);
 
             $this->restaurantRepository->update($id, $newData);
 
