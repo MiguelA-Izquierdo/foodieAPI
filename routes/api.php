@@ -34,6 +34,7 @@ Route::prefix('restaurants')->group(function () {
 Route::prefix('users')->group(function () {
     Route::get('/', 'App\Http\Controllers\UserController@index'); // Endpoint para obtener todos los usuarios
     Route::get('/{id}', 'App\Http\Controllers\UserController@show'); // Endpoint para obtener un usuario por ID
+    Route::post('/login', 'App\Http\Controllers\UserController@login');
     Route::post('/', 'App\Http\Controllers\UserController@store'); // Endpoint para crear un nuevo usuario
     Route::patch('/{id}', 'App\Http\Controllers\UserController@update'); // Endpoint para actualizar un usuario
     Route::delete('/{id}', 'App\Http\Controllers\UserController@destroy'); // Endpoint para eliminar un usuario
