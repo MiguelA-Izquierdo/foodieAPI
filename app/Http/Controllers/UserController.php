@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\UserRepository;
+use App\Providers\AuthServiceProvider;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -77,4 +79,28 @@ class UserController extends Controller
         }
     }
     
+    public function login(Request $request)
+{
+    $name = $request->input('name');
+    $password = $request->input('password');
+
+    try {
+        $user = User::where('name', $name)->first();
+
+        if (!$user || !AuthServiceProvider::compare($password, $user->password)) {
+            throw new \Exception('Invalid username or password');
+        }
+
+        $payload = [
+            'id' => $user->id,
+            'name' => $user->name, 
+        ];
+
+        $token = AuthServiceProvider::signJWT($payload);
+
+        return response()->json(['user' => $user, 'token' => $token]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 401);
+    }
+}
 }

@@ -8,7 +8,7 @@ use App\Exceptions\HttpError;
 
 class AuthServiceProvider extends ServiceProvider
 {
-     private static $secret = null;
+    private static $secret = null;
 
     public static function getSecret()
     {
@@ -33,14 +33,16 @@ class AuthServiceProvider extends ServiceProvider
 
     public static function signJWT($payload)
     {
-        $token = JWT::encode($payload, self::$secret);
+        $secret = self::getSecret(); // Obtener la clave secreta
+        $token = JWT::encode($payload, $secret, 'HS256');
         return $token;
     }
 
     public static function verifyJWTGettingPayload($token)
     {
         try {
-            $result = JWT::decode($token, self::$secret, ['HS256']);
+            $secret = self::getSecret(); // Obtener la clave secreta
+            $result = JWT::decode($token, $secret, ['HS256']);
             if (is_string($result)) {
                 throw new \Exception();
             }
@@ -51,7 +53,7 @@ class AuthServiceProvider extends ServiceProvider
         }
     }
 
-     public function register()
+    public function register()
     {
         // Aquí puedes registrar cualquier servicio que desees.
     }
