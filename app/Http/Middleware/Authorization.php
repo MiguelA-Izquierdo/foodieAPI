@@ -10,6 +10,8 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests as AuthenticatesRequestsContract;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Providers\AuthServiceProvider;
 
 class Authorization extends Authorize
 {
@@ -70,10 +72,10 @@ class Authorization extends Authorize
     private function verifyToken($token)
     {
         try {
-            $secret = self::getSecret();
-            $result = JWT::decode($token, $secret, ['HS256']);
+            $result = AuthServiceProvider::verifyJWTGettingPayload($token);
             return (array)$result;
         } catch (\Exception $error) {
+          
             return null;
         }
     }

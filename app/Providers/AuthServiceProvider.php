@@ -4,6 +4,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use App\Exceptions\HttpError;
 
 class AuthServiceProvider extends ServiceProvider
@@ -41,8 +42,9 @@ class AuthServiceProvider extends ServiceProvider
     public static function verifyJWTGettingPayload($token)
     {
         try {
-            $secret = self::getSecret(); // Obtener la clave secreta
-            $result = JWT::decode($token, $secret, ['HS256']);
+          
+            $secret = self::getSecret(); 
+            $result = JWT::decode($token, new Key($secret, 'HS256'));
             if (is_string($result)) {
                 throw new \Exception();
             }
