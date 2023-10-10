@@ -1,15 +1,16 @@
 {
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build",
-        "prepare": "husky install"
-    },
-    "devDependencies": {
-        "axios": "^1.1.2",
-        "laravel-vite-plugin": "^0.8.0",
-        "vite": "^4.0.0",
-        "husky": "^8.0.0"
-    }
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "composer install --no-interaction --prefer-dist --optimize-autoloader",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "axios": "^1.1.2",
+    "laravel-vite-plugin": "^0.8.0",
+    "vite": "^4.0.0",
+    "husky": "^8.0.0"
+  }
 }
