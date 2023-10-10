@@ -26,7 +26,7 @@ Route::prefix('restaurants')->group(function () {
     Route::post('/', 'App\Http\Controllers\RestaurantController@store');
     Route::get('/{id}', 'App\Http\Controllers\RestaurantController@show');
     Route::patch('/{id}', 'App\Http\Controllers\RestaurantController@update');
-    Route::delete('/{id}', 'App\Http\Controllers\RestaurantController@destroy');
+    Route::delete('/{id}', [RestaurantController::class, 'destroy'])->middleware(['custom-auth']);
 });
 
 //Users
