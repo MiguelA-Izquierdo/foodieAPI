@@ -24,8 +24,8 @@ API desarrollada con PHP y Laravel para la gestión de restaurantes y usuarios c
 
 ## Uso
 
-- Registro de Usuario: `POST /api/`
-- Inicio de Sesión: `POST /api/login`
+- Registro de Usuario: `POST /api/users`
+- Inicio de Sesión: `POST /api/users/login`
 
 ### Rutas de Restaurantes
 
